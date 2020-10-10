@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using MiniRpcFactory.Commands;
 using MiniRpcFactory.Commands.Contracts;
+using MiniRpcFactory.Functions;
 using MiniRpcFactory.Logging;
 using MiniRpcFactory.RpcService.Contracts;
 using RoR2;
@@ -26,7 +27,7 @@ namespace MiniRpcFactory.Demo
         }
     }
 
-    public class ExampleCommand: Command<string, bool>
+    public class ExampleCommand: FunctionCommand<string, bool>
     {
         public ExampleCommand(CommandTarget target) : base(target)
         {
@@ -40,7 +41,7 @@ namespace MiniRpcFactory.Demo
         }
     }
 
-    public class ExampleCommandWithClassProperties : Command<string, bool>
+    public class ExampleCommandWithClassProperties : FunctionCommand<string, bool>
     {
         public int ExampleClassProperty { get; set; }
 
@@ -56,7 +57,7 @@ namespace MiniRpcFactory.Demo
         }
     }
 
-    public class ExampleCommandReturnRpcResult : Command<string, RpcResult>
+    public class ExampleCommandReturnRpcResult : FunctionCommand<string, RpcResult>
     {
         public ExampleCommandReturnRpcResult(CommandTarget target) : base(target)
         {
@@ -70,7 +71,7 @@ namespace MiniRpcFactory.Demo
         }
     }
 
-    public class ExampleCommandAction : Command<string, object>
+    public class ExampleCommandAction : FunctionCommand<string, object>
     {
         public ExampleCommandAction(CommandTarget target) : base(target)
         {

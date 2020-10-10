@@ -1,4 +1,4 @@
-﻿namespace MiniRpcFactory.Commands
+﻿namespace MiniRpcFactory.Commands.Contracts
 {
     public class BaseCommand
     {

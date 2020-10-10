@@ -1,20 +1,21 @@
-﻿using MiniRpcFactory.Commands;
+﻿using MiniRpcFactory.Actions;
+using MiniRpcFactory.Commands;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace MiniRpcFactory.CommandFactory
+namespace MiniRpcFactory.ActionFactory
 {
-    internal sealed class CommandFactory
+    internal sealed class ActionFactory
     {
-        private static Lazy<CommandFactory> _commandFactory { get; set; }
-        private static CommandFactory _instance { get { return _commandFactory.Value; } }
+        private static Lazy<ActionFactory> _actionFactory { get; set; }
+        private static ActionFactory _instance { get { return _actionFactory.Value; } }
 
-        internal static CommandFactory CreateFactoryInstance()
+        internal static ActionFactory CreateFactoryInstance()
         {
-            if (!_commandFactory.IsValueCreated)
+            if (!_actionFactory.IsValueCreated)
             {
-                _commandFactory = new Lazy<CommandFactory>(() => new CommandFactory());
+                _actionFactory = new Lazy<ActionFactory>(() => new ActionFactory());
             }
 
             return _instance;
@@ -26,8 +27,8 @@ namespace MiniRpcFactory.CommandFactory
          */
 
         // this delegate is just, so you don't have to pass an object array. _(params)_
-        internal delegate Command<RequestType, ResponseType> ConstructorDelegate<RequestType, ResponseType>(params object[] args);
-        internal ConstructorDelegate<RequestType, ResponseType> GenerateCommand<RequestType, ResponseType>(Type commandType, params Type[] parameters)
+        internal delegate ActionCommand<RequestType> ActionConstructorDelegate<RequestType>(params object[] args);
+        internal ActionConstructorDelegate<RequestType> GenerateCommand<RequestType>(Type commandType, params Type[] parameters)
         {
             // Added this so users can just pass in their parameters
             var parameterTypes = parameters.Select(p => p.GetType()).ToArray();
@@ -52,7 +53,7 @@ namespace MiniRpcFactory.CommandFactory
             // just call the constructor.
             var body = Expression.New(constructorInfo, constructorParameters);
 
-            var constructor = Expression.Lambda<ConstructorDelegate<RequestType, ResponseType>>(body, paramExpr);
+            var constructor = Expression.Lambda<ActionConstructorDelegate<RequestType>>(body, paramExpr);
             return constructor.Compile();
         }
     }

@@ -6,15 +6,15 @@ using RoR2;
 using System;
 using Logger = MiniRpcFactory.Logging.Logger;
 
-namespace MiniRpcFactory.Commands
+namespace MiniRpcFactory.Functions
 {
     // TODO: Re-introduce ICommand interface?
-    public class Command<RequestType, ResponseType> : BaseCommand
+    public class FunctionCommand<RequestType, ResponseType> : BaseCommand
     {
         private Target _target { get; set; }
         private Func<NetworkUser, RequestType, ResponseType> _commandFunction { get; set; }
 
-        public Command(CommandTarget target)
+        public FunctionCommand(CommandTarget target)
         {
             switch (target)
             {

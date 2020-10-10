@@ -1,14 +1,15 @@
 ﻿using MiniRpcFactory.Commands;
 using MiniRpcFactory.Commands.Contracts;
+using MiniRpcFactory.Functions;
 using MiniRpcFactory.Logging;
 using MiniRpcFactory.RpcService.Contracts;
 using MiniRpcLib;
 using RoR2;
 using System;
 
-namespace ArtifactOfDoom.Commands
+namespace ArtifactOfDoom.Functions
 {
-    public class IsArtifactActiveCommand : Command<bool, RpcResult>
+    public class IsArtifactActiveCommand : FunctionCommand<bool, RpcResult>
     {
         public bool IsActive { get; set; }
 

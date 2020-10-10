@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MiniRpcFactory.Commands.Contracts
+﻿namespace MiniRpcFactory.Commands.Contracts
 {
     public enum CommandTarget
     {

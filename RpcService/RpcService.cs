@@ -1,10 +1,13 @@
-﻿using MiniRpcFactory.CommandFactory.Contracts;
+﻿using MiniRpcFactory.ActionFactory.Contracts;
+using MiniRpcFactory.FunctionFactory.Contracts;
 using MiniRpcFactory.Logging;
 using MiniRpcFactory.RpcService.Contracts;
 using MiniRpcLib;
+using MiniRpcLib.Action;
 using MiniRpcLib.Func;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Logger = MiniRpcFactory.Logging.Logger;
@@ -16,8 +19,11 @@ namespace MiniRpcFactory.RpcService
         private static Lazy<RpcService> _rpcService { get; set; }
         private static RpcService _instance { get { return _rpcService.Value; } }
         private static MiniRpcInstance _miniRpcInstance { get; set; }
-        private CommandFactoryInstance _commandFactory = new CommandFactoryInstance();
-        private Dictionary<string, IRpcFunc<object, object>> _miniRpcCommands = new Dictionary<string, IRpcFunc<object, object>>();
+        private FunctionFactoryInstance _commandFactory = new FunctionFactoryInstance();
+        private ActionFactoryInstance _actionFactory = new ActionFactoryInstance();
+
+        private Dictionary<string, IRpcFunc<object, object>> _miniRpcFunctionCommands = new Dictionary<string, IRpcFunc<object, object>>();
+        private Dictionary<string, IRpcAction<object>> _miniRpcActionCommands = new Dictionary<string, IRpcAction<object>>();
 
         private RpcService()
         {
@@ -51,7 +57,7 @@ namespace MiniRpcFactory.RpcService
 
         public void RegisterCommand<RequestType, ResponseType>(string commandName, Type commandType, params object[] parameters)
         {
-            if(_miniRpcCommands.ContainsKey(commandName))
+            if (_miniRpcFunctionCommands.ContainsKey(commandName))
             {
                 return;
             }
@@ -62,27 +68,50 @@ namespace MiniRpcFactory.RpcService
             var commandTarget = command.GetTarget();
             var miniRpcCommand = _miniRpcInstance.RegisterFunc(commandTarget, commandFunction);
 
-            _miniRpcCommands.Add(commandName, (IRpcFunc<object, object>)miniRpcCommand);
+            _miniRpcFunctionCommands.Add(commandName, (IRpcFunc<object, object>)miniRpcCommand);
             command.MarkAsRegistered();
         }
 
         public IRpcFunc<RequestType, ResponseType> GetMiniRpcCommandById<RequestType, ResponseType>(string commandName)
         {
-            if (!_miniRpcCommands.ContainsKey(commandName))
+            if (!_miniRpcFunctionCommands.ContainsKey(commandName))
             {
                 // TODO: Put a sensible error message in exception constructor
                 throw new NotSupportedException();
             }
 
-            var command = _miniRpcCommands[commandName];
+            var command = _miniRpcFunctionCommands[commandName];
             // TODO: Replace Activator throughout codebase with Expression
             return Activator.CreateInstance(command.GetType(), true) as IRpcFunc<RequestType, ResponseType>;
         }
 
+        public void RegisterCommand<RequestType>(string commandName, Type commandType, params object[] parameters)
+        {
+            if (_miniRpcActionCommands.ContainsKey(commandName))
+            {
+                return;
+            }
+
+            var commandConstructor = _actionFactory.Instance.GenerateCommand<RequestType>(commandType, parameters.Select(p => p.GetType()).ToArray());
+            var command = commandConstructor(parameters);
+            var commandAction = command.GetCommandAction();
+            var commandTarget = command.GetTarget();
+            var miniRpcCommand = _miniRpcInstance.RegisterAction(commandTarget, commandAction);
+
+            _miniRpcActionCommands.Add(commandName, (IRpcAction<object>)miniRpcCommand);
+            command.MarkAsRegistered();
+        }
+
         public void InvokeRpcCommand(string commandName, object requestParameter, Action<object> handleResponseAction)
         {
-            var command = _miniRpcCommands[commandName];
+            var command = _miniRpcFunctionCommands[commandName];
             command.Invoke(requestParameter, handleResponseAction);
+        }
+
+        public void InvokeRpcCommand(string commandName, object requestParameter)
+        {
+            var command = _miniRpcActionCommands[commandName];
+            command.Invoke(requestParameter);
         }
 
         public void HandleRpcResult(RpcResult result)

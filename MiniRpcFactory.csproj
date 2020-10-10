@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MiniRpcFactory.Demo\**" />
+    <EmbeddedResource Remove="MiniRpcFactory.Demo\**" />
+    <None Remove="MiniRpcFactory.Demo\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\Games\Steam\steamapps\common\Risk of Rain 2\r2modman\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
@@ -65,8 +71,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CommandFactory\" />
-    <Folder Include="CommandFactory.Contracts\" />
     <Folder Include="RpcService.Contracts\" />
     <Folder Include="RpcService\" />
   </ItemGroup>
