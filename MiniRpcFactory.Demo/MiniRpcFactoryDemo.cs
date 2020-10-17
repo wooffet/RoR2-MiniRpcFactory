@@ -5,6 +5,7 @@ using MiniRpcFactory.Functions;
 using MiniRpcFactory.Logging;
 using MiniRpcFactory.RpcService.Contracts;
 using RoR2;
+using System;
 using UnityEngine;
 
 namespace MiniRpcFactory.Demo
@@ -20,11 +21,14 @@ namespace MiniRpcFactory.Demo
         private const string ModName = "MiniRpcFactoryDemo";
         private const string ModGuid = "com.wooffet.minirpcfactorydemo";
 
+        private RpcServiceInstance _rpc = new RpcServiceInstance(ModGuid);
+
 
         public MiniRpcFactoryDemo()
         {
-            var rpcService = RpcServiceInstance.Instance;
+            var rpcService = _rpc.Instance;
 
+            // why am I supplying values for these parameters?
             var exampleCommandRequestValue = "Example Command Request Value";
             rpcService.RegisterCommand<string, bool>(nameof(ExampleCommand), typeof(ExampleCommand), CommandTarget.Client, exampleCommandRequestValue);
 
@@ -35,7 +39,32 @@ namespace MiniRpcFactory.Demo
             var exampleCommandReturnRpcResultRequestValue = "Example Command Return Rpc Result Request Value";
             rpcService.RegisterCommand<string, RpcResult>(nameof(ExampleCommandReturnRpcResult), typeof(ExampleCommandReturnRpcResult), CommandTarget.Client, exampleCommandReturnRpcResultRequestValue);
 
+            var exampleCommandActionRequestValue = "Example Command Action Request Value";
+            rpcService.RegisterCommand<string>(nameof(ExampleCommandAction), typeof(ExampleCommandAction), exampleCommandActionRequestValue);
 
+            RegisterGameEvents();
+        }
+
+        private void RegisterGameEvents()
+        {
+            On.RoR2.UI.HUD.Awake += (orig, self) =>
+            {
+                orig(self);
+
+                var rpcService = _rpc.Instance;
+
+                var exampleCommandRequestValue = "Example Command Request Value";
+                rpcService.InvokeRpcCommand(nameof(ExampleCommand), exampleCommandRequestValue, (result) => Debug.Log($"Result: {result}"));
+
+                var exampleCommandWithClassPropertiesResponseValue = "Example Command With Class Propertied Request Value";
+                rpcService.InvokeRpcCommand(nameof(ExampleCommandWithClassProperties), exampleCommandWithClassPropertiesResponseValue, (result) => Debug.Log($"Result: {result}"));
+
+                var exampleCommandReturnRpcResultRequestValue = "Example Command Return Rpc Result Request Value";
+                rpcService.InvokeRpcCommand(nameof(ExampleCommandReturnRpcResult), exampleCommandReturnRpcResultRequestValue, (result) => rpcService.HandleRpcResult(result as RpcResult));
+
+                var exampleCommandActionRequestValue = "Example Command Action Request Value";
+                rpcService.InvokeRpcCommand(nameof(ExampleCommandAction), exampleCommandActionRequestValue);
+            };
         }
     }
 
