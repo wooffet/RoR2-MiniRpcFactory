@@ -5,7 +5,6 @@ using MiniRpcFactory.Functions;
 using MiniRpcFactory.Logging;
 using MiniRpcFactory.RpcService.Contracts;
 using RoR2;
-using System;
 using UnityEngine;
 
 namespace MiniRpcFactory.Demo
