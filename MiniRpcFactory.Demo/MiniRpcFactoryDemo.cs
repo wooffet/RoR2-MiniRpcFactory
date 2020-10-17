@@ -28,19 +28,14 @@ namespace MiniRpcFactory.Demo
         {
             var rpcService = _rpc.Instance;
 
-            // why am I supplying values for these parameters?
-            var exampleCommandRequestValue = "Example Command Request Value";
-            rpcService.RegisterCommand<string, bool>(nameof(ExampleCommand), typeof(ExampleCommand), CommandTarget.Client, exampleCommandRequestValue);
+            rpcService.RegisterCommand<string, bool>(nameof(ExampleCommand), typeof(ExampleCommand), CommandTarget.Client);
 
-            var exampleCommandWithClassPropertiesResponseValue = true;
             var classInput = 99;
-            rpcService.RegisterCommand<string, bool>(nameof(ExampleCommandWithClassProperties), typeof(ExampleCommandWithClassProperties), CommandTarget.Client, exampleCommandWithClassPropertiesResponseValue, classInput);
+            rpcService.RegisterCommand<string, bool>(nameof(ExampleCommandWithClassProperties), typeof(ExampleCommandWithClassProperties), CommandTarget.Client, classInput);
 
-            var exampleCommandReturnRpcResultRequestValue = "Example Command Return Rpc Result Request Value";
-            rpcService.RegisterCommand<string, RpcResult>(nameof(ExampleCommandReturnRpcResult), typeof(ExampleCommandReturnRpcResult), CommandTarget.Client, exampleCommandReturnRpcResultRequestValue);
+            rpcService.RegisterCommand<string, RpcResult>(nameof(ExampleCommandReturnRpcResult), typeof(ExampleCommandReturnRpcResult), CommandTarget.Client);
 
-            var exampleCommandActionRequestValue = "Example Command Action Request Value";
-            rpcService.RegisterCommand<string>(nameof(ExampleCommandAction), typeof(ExampleCommandAction), exampleCommandActionRequestValue);
+            rpcService.RegisterCommand<string>(nameof(ExampleCommandAction), typeof(ExampleCommandAction), CommandTarget.Client);
 
             RegisterGameEvents();
         }
