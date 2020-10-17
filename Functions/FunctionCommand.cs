@@ -30,6 +30,7 @@ namespace MiniRpcFactory.Functions
 
         protected virtual ResponseType FunctionToRun(NetworkUser networkUser, RequestType request)
         {
+            Logger.LogError($"No function supplied by child class of Command for request type: {request.GetType().Name}");
             return (ResponseType)Activator.CreateInstance(typeof(RpcResult), false, $"No function supplied child class of Command for request type: {nameof(RequestType)} response type {nameof(ResponseType)}", LogSeverity.Error);
         }
 
@@ -66,24 +67,5 @@ namespace MiniRpcFactory.Functions
         {
             MarkCommandAsUnregistered();
         }
-
-        #region Actions
-        // TODO: split off into action factory, interface and class
-        private Action<RequestType> _actionToRun;
-
-        protected void SetCommandAction(Action<RequestType> actionToRun)
-        {
-            _actionToRun = actionToRun;
-        }
-
-        public Action<RequestType> GetCommandAction()
-        {
-            if (_actionToRun is null)
-            {
-                _actionToRun = (RequestType requestType) => { Logger.LogError($"No action supplied by child class of Command for request type: {requestType.GetType().Name}"); };
-            }
-            return _actionToRun;
-        }
-        #endregion
     }
 }

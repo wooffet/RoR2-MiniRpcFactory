@@ -25,27 +25,6 @@ namespace MiniRpcFactory.Actions
             }
         }
 
-        public Target GetTarget()
-        {
-            return _target;
-        }
-
-        public bool IsInstanceRegistered()
-        {
-            return IsCommandRegistered();
-        }
-
-        public void MarkAsRegistered()
-        {
-            MarkCommandAsRegistered();
-        }
-
-        public void MarkAsUnregistered()
-        {
-            MarkCommandAsUnregistered();
-        }
-
-        // TODO: split off into action factory, interface and class
         private Action<NetworkUser, RequestType> _actionToRun;
 
         protected void SetCommandAction(Action<NetworkUser, RequestType> actionToRun)
@@ -65,6 +44,26 @@ namespace MiniRpcFactory.Actions
         private void DefaultAction(RequestType requestType)
         {
             Logger.LogError($"No action supplied by child class of Command for request type: {requestType.GetType().Name}");
+        }
+
+        public Target GetTarget()
+        {
+            return _target;
+        }
+
+        public bool IsInstanceRegistered()
+        {
+            return IsCommandRegistered();
+        }
+
+        public void MarkAsRegistered()
+        {
+            MarkCommandAsRegistered();
+        }
+
+        public void MarkAsUnregistered()
+        {
+            MarkCommandAsUnregistered();
         }
     }
 }

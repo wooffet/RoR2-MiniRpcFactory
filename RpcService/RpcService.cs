@@ -1,5 +1,4 @@
-﻿using MiniRpcFactory.ActionFactory.Contracts;
-using MiniRpcFactory.FunctionFactory.Contracts;
+﻿using MiniRpcFactory.CommandFactory.Contracts;
 using MiniRpcFactory.Logging;
 using MiniRpcFactory.RpcService.Contracts;
 using MiniRpcLib;
@@ -7,7 +6,6 @@ using MiniRpcLib.Action;
 using MiniRpcLib.Func;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Logger = MiniRpcFactory.Logging.Logger;
@@ -19,8 +17,7 @@ namespace MiniRpcFactory.RpcService
         private static Lazy<RpcService> _rpcService { get; set; }
         private static RpcService _instance { get { return _rpcService.Value; } }
         private static MiniRpcInstance _miniRpcInstance { get; set; }
-        private FunctionFactoryInstance _commandFactory = new FunctionFactoryInstance();
-        private ActionFactoryInstance _actionFactory = new ActionFactoryInstance();
+        private CommandFactoryInstance _commandFactory = new CommandFactoryInstance();
 
         private Dictionary<string, IRpcFunc<object, object>> _miniRpcFunctionCommands = new Dictionary<string, IRpcFunc<object, object>>();
         private Dictionary<string, IRpcAction<object>> _miniRpcActionCommands = new Dictionary<string, IRpcAction<object>>();
@@ -72,19 +69,6 @@ namespace MiniRpcFactory.RpcService
             command.MarkAsRegistered();
         }
 
-        public IRpcFunc<RequestType, ResponseType> GetMiniRpcCommandById<RequestType, ResponseType>(string commandName)
-        {
-            if (!_miniRpcFunctionCommands.ContainsKey(commandName))
-            {
-                // TODO: Put a sensible error message in exception constructor
-                throw new NotSupportedException();
-            }
-
-            var command = _miniRpcFunctionCommands[commandName];
-            // TODO: Replace Activator throughout codebase with Expression
-            return Activator.CreateInstance(command.GetType(), true) as IRpcFunc<RequestType, ResponseType>;
-        }
-
         public void RegisterCommand<RequestType>(string commandName, Type commandType, params object[] parameters)
         {
             if (_miniRpcActionCommands.ContainsKey(commandName))
@@ -92,7 +76,7 @@ namespace MiniRpcFactory.RpcService
                 return;
             }
 
-            var commandConstructor = _actionFactory.Instance.GenerateCommand<RequestType>(commandType, parameters.Select(p => p.GetType()).ToArray());
+            var commandConstructor = _commandFactory.Instance.GenerateCommand<RequestType>(commandType, parameters.Select(p => p.GetType()).ToArray());
             var command = commandConstructor(parameters);
             var commandAction = command.GetCommandAction();
             var commandTarget = command.GetTarget();
